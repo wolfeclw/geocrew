@@ -1,8 +1,19 @@
 
-
-
-
-prepdata <- function(d) {
+#' Clean and prepare daily air pollution data
+#'
+#' @param d a data frame with daily air pollution measurements
+#' @param cohort character; name of cohort or study
+#'
+#' @return a data frame
+#' @export
+#'
+#' @examples
+#'
+#' \dontrun{
+#'prepdata(d, cohort = NULL)
+#'}
+#'
+prepdata <- function(d, cohort_name = NULL) {
 
   if (!'gest_age' %in% names(d)) {
     message('Could not find column `gest_age`. This column has been added to the export data frame. ')
@@ -61,8 +72,8 @@ prepdata <- function(d) {
                                                  lubridate::days_in_month(date), lub_days),
                            mo_days = n()))  %>%
     dplyr::group_split(id, year_since_birth) %>%
-    map_df(.,
-           ~mutate(.,
+    purrr::map_df(.,
+           ~dplyr::mutate(.,
                    yr_interval = lubridate::interval(dplyr::first(date), dplyr::last(date)),
                    N_days_year = as.numeric(lubridate::as.duration((yr_interval)), 'days') + 1,
                    N_days_year = ifelse(N_days_year < 365, 365, N_days_year),
@@ -71,6 +82,11 @@ prepdata <- function(d) {
                   mo_days, yr_days)
     # dplyr::select(-c(f_date_id, l_date_id, b_days, e_days, b_max, e_max, f_date, l_date, interval_max, lub_days,
     #                  yr_interval))
+
+  if (!is.null(cohort_name)) {
+    n_data$cohort <- cohort_name
+    n_data <- dplyr::relocate(n_data, cohort)
+  }
 
   n_data
 }

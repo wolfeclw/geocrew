@@ -1,11 +1,19 @@
 
-
-pd <- prepdata(t)
-
-
-
-
-air_means <- function(d, time_unit = c('month', 'year')) {
+#' Calculate mean air pollution levels by a specific time interval
+#'
+#' @param d a data frame created by `prepdata()`
+#' @param time_unit character; averaging interval ('prenatal', 'month", 'year')
+#'
+#' @return a data frame
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' get_mean_pollution(d, time_unit = 'month')
+#' }
+#'
+get_mean_pollution <- function(d, time_unit = c('month', 'year')) {
 
   if (length(time_unit) > 1 & time_unit[1] %in% c('month', 'year')) {
     message(paste('More than one value was supplied to `time_unit`. Only the first element', time_unit[1],'will be used.'))
@@ -35,9 +43,9 @@ air_means <- function(d, time_unit = c('month', 'year')) {
 
   air_means_i <- function(d, time_unit, grp) {
     d %>%
-      group_by(id, across({{grp}})) %>%
-      summarise(across(c(PM25, NO2, O3), mean, .names = '{.col}_{time_unit}'),
-                n_days = n())
+      dplyr::group_by(id, across({{grp}})) %>%
+      dplyr::summarise(across(c(PM25, NO2, O3), mean, .names = '{.col}_{time_unit}'),
+                n_days = dplyr::n())
   }
 
   d_mean <- air_means_i(d, time_unit = time_unit, grp = all_of(t_grp))
@@ -47,18 +55,9 @@ air_means <- function(d, time_unit = c('month', 'year')) {
   dn <- n_names %>%
     purrr::map_dfc(~tibble::tibble(!!. := d_mean$n_days))
 
-  d_sumry <- bind_cols(d_mean, dn)
+  d_sumry <- dplyr::bind_cols(d_mean, dn)
 
   d_sumry %>%
-    select(id, starts_with({{time_unit}}), starts_with('NO2'), starts_with('PM25'), starts_with('O3'))
+    dplyr::select(id, dplyr::starts_with({{time_unit}}), dplyr::starts_with('NO2'), dplyr::starts_with('PM25'), dplyr::starts_with('O3'))
 
 }
-
-air_means(pd, 'month')
-
-air_means(pd, 'year')
-
-
-###
-
-
