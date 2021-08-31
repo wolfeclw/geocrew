@@ -1,21 +1,5 @@
 
 
-#
-# t_data %>%
-#   group_nest(id, dob, .key = 'air_data') %>%
-#   filter(map(.$air_data, ~PM25 < 1))
-
-
-
-
-t <- t_data %>%
-  arrange(id, date) %>%
-  filter(id %in% c(100027, 100112))
-#group_by(id, date)
-
-# t %>%
-#   mutate(interval_months = lubridate::interval(date, dob),
-#          month_since_birth = interval_months %/% months(1))
 
 
 prepdata <- function(d) {
@@ -54,8 +38,6 @@ prepdata <- function(d) {
                                               month_since_birth + (12 * (year_since_birth - 1)), month_since_birth),
                    month_since_birth = ifelse(month_since_birth >= 0, month_since_birth + 1, month_since_birth))) %>%
     dplyr::select(-interval_date)
-  # maxmon = as.numeric(round((date - dob)/365.25 * 12, digits = 0))
-                # maxmon = as.numeric(floor((date - dob)/365.25 * 12))
 
   n_data <- f_data %>%
     dplyr::group_split(id) %>%
@@ -76,14 +58,17 @@ prepdata <- function(d) {
                            lub_days = lubridate::days(l_date - f_date),
                            lub_days = lubridate::day(lub_days) + 1,
                            N_days_month = ifelse(b_max < lub_days | e_max < lub_days,
-                                                 lubridate::days_in_month(date), lub_days)))  %>%
+                                                 lubridate::days_in_month(date), lub_days),
+                           mo_days = n()))  %>%
     dplyr::group_split(id, year_since_birth) %>%
     map_df(.,
            ~mutate(.,
                    yr_interval = lubridate::interval(dplyr::first(date), dplyr::last(date)),
                    N_days_year = as.numeric(lubridate::as.duration((yr_interval)), 'days') + 1,
-                   N_days_year = ifelse(N_days_year < 365, 365, N_days_year))) %>%
-    dplyr::select(id, dob, gest_age, date, PM25, NO2, O3, N_days_month, month_since_birth, N_days_year, year_since_birth)
+                   N_days_year = ifelse(N_days_year < 365, 365, N_days_year),
+                   yr_days = n())) %>%
+    dplyr::select(id, dob, gest_age, date, PM25, NO2, O3, N_days_month, month_since_birth, N_days_year, year_since_birth,
+                  mo_days, yr_days)
     # dplyr::select(-c(f_date_id, l_date_id, b_days, e_days, b_max, e_max, f_date, l_date, interval_max, lub_days,
     #                  yr_interval))
 
