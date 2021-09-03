@@ -3,4 +3,5 @@
 export("%>%")
 export(get_mean_pollution)
 export(prepdata)
+export(read_daily_pollution)
 importFrom(magrittr,"%>%")

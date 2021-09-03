@@ -4,12 +4,12 @@
 \alias{get_mean_pollution}
 \title{Calculate mean air pollution levels by a specific time interval}
 \usage{
-get_mean_pollution(d, time_unit = c("month", "year"))
+get_mean_pollution(df, time_unit = c("month", "year"))
 }
 \arguments{
-\item{d}{a data frame created by \code{prepdata()}}
-
 \item{time_unit}{character; averaging interval ('prenatal', 'month", 'year')}
+
+\item{d}{a data frame created by \code{prepdata()}}
 }
 \value{
 a data frame
@@ -20,7 +20,7 @@ Calculate mean air pollution levels by a specific time interval
 \examples{
 \dontrun{
 
-get_mean_pollution(d, time_unit = 'month')
+get_mean_pollution(df, time_unit = 'month')
 }
 
 }

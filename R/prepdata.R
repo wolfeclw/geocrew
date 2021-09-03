@@ -21,17 +21,17 @@ prepdata <- function(d, cohort_name = NULL) {
   }
 
   if (dplyr::is.grouped_df(d)) {
-    d <- ungroup(d)
+    d <- dplyr::ungroup(d)
   }
 
   f_data <- d %>%
-    dplyr::arrange(id, date) %>%
-    dplyr::group_split(id) %>%
+    dplyr::arrange(subjectid, date) %>%
+    dplyr::group_split(subjectid) %>%
     purrr::map(.,
-        ~filter(., !date < (dob - lubridate::dyears(1)))) %>%
+        ~dplyr::filter(., !date < (dob - lubridate::dyears(1)))) %>%
     purrr::map_df(.,
            ~dplyr::mutate(.,
-                   O3 = ifelse(O3 == 0, NA, O3),
+                   o3 = ifelse(o3 == 0, NA, o3),
                    # interval_date = lubridate::interval(dob, date - lubridate::ddays(1)),
                    interval_date = lubridate::interval(dob, date),
                    # month_since_birth = interval_date %/% months(1),
@@ -51,34 +51,34 @@ prepdata <- function(d, cohort_name = NULL) {
     dplyr::select(-interval_date)
 
   n_data <- f_data %>%
-    dplyr::group_split(id) %>%
+    dplyr::group_split(subjectid) %>%
     purrr::map_df(.,
                   ~dplyr::mutate(.,
-                          f_date_id = first(date),
-                          l_date_id = last(date),
+                          f_date_id = dplyr::first(date),
+                          l_date_id = dplyr::last(date),
                           b_days = as.numeric(lubridate::as.duration(lubridate::interval(f_date_id, date)), 'days'),
                           e_days = as.numeric(lubridate::as.duration(lubridate::interval(date, l_date_id)), 'days'))) %>%
-    dplyr::group_split(id, month_since_birth) %>%
+    dplyr::group_split(subjectid, month_since_birth) %>%
     purrr::map_df(.,
                   ~dplyr::mutate(.,
                            b_max = max(b_days),
                            e_max = max(e_days),
-                           f_date = first(date),
-                           l_date = last(date),
+                           f_date = dplyr::first(date),
+                           l_date = dplyr::last(date),
                            interval_max = lubridate::interval(f_date, l_date),
                            lub_days = lubridate::days(l_date - f_date),
                            lub_days = lubridate::day(lub_days) + 1,
-                           N_days_month = ifelse(b_max < lub_days | e_max < lub_days,
+                           n_days_month = ifelse(b_max < lub_days | e_max < lub_days,
                                                  lubridate::days_in_month(date), lub_days),
-                           mo_days = n()))  %>%
-    dplyr::group_split(id, year_since_birth) %>%
+                           mo_days = dplyr::n()))  %>%
+    dplyr::group_split(subjectid, year_since_birth) %>%
     purrr::map_df(.,
            ~dplyr::mutate(.,
                    yr_interval = lubridate::interval(dplyr::first(date), dplyr::last(date)),
-                   N_days_year = as.numeric(lubridate::as.duration((yr_interval)), 'days') + 1,
-                   N_days_year = ifelse(N_days_year < 365, 365, N_days_year),
-                   yr_days = n())) %>%
-    dplyr::select(id, dob, gest_age, date, PM25, NO2, O3, N_days_month, month_since_birth, N_days_year, year_since_birth,
+                   n_days_year = as.numeric(lubridate::as.duration((yr_interval)), 'days') + 1,
+                   n_days_year = ifelse(n_days_year < 365, 365, n_days_year),
+                   yr_days = dplyr::n())) %>%
+    dplyr::select(subjectid, dob, gest_age, date, pm25, no2, o3, n_days_month, month_since_birth, n_days_year, year_since_birth,
                   mo_days, yr_days)
     # dplyr::select(-c(f_date_id, l_date_id, b_days, e_days, b_max, e_max, f_date, l_date, interval_max, lub_days,
     #                  yr_interval))
