@@ -10,7 +10,7 @@
 #' @examples
 #' \dontrun{
 #'
-#' get_mean_pollution(df, time_unit = 'month')
+#' get_monyr_means(df, time_unit = 'month')
 #' }
 #'
 get_monyr_means <- function(df, time_unit = c('month', 'year')) {

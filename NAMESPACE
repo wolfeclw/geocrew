@@ -2,6 +2,7 @@
 
 export("%>%")
 export(get_monyr_means)
+export(get_prenatal_means)
 export(prepdata)
 export(read_daily_pollution)
 importFrom(magrittr,"%>%")

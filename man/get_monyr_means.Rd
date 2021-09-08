@@ -20,7 +20,7 @@ Calculate mean air pollution levels by a specific time interval
 \examples{
 \dontrun{
 
-get_mean_pollution(df, time_unit = 'month')
+get_monyr_means(df, time_unit = 'month')
 }
 
 }
