@@ -80,12 +80,15 @@ prepdata <- function(d, cohort_name = NULL) {
                    yr_days = dplyr::n())) %>%
     dplyr::select(subjectid, dob, gest_age, date, pm25, no2, o3, n_days_month, month_since_birth, n_days_year, year_since_birth,
                   mo_days, yr_days)
+  # %>%
+  #   dplyr::distinct()
     # dplyr::select(-c(f_date_id, l_date_id, b_days, e_days, b_max, e_max, f_date, l_date, interval_max, lub_days,
     #                  yr_interval))
 
   if (!is.null(cohort_name)) {
     n_data$cohort <- cohort_name
     n_data <- dplyr::relocate(n_data, cohort)
+    # %>% dplyr::distinct()
   }
 
   n_data

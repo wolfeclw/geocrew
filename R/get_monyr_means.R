@@ -13,7 +13,7 @@
 #' get_mean_pollution(df, time_unit = 'month')
 #' }
 #'
-get_mean_pollution <- function(df, time_unit = c('month', 'year')) {
+get_monyr_means <- function(df, time_unit = c('month', 'year')) {
 
   if (length(time_unit) > 1 & time_unit[1] %in% c('month', 'year')) {
     message(paste('More than one value was supplied to `time_unit`. Only the first element', time_unit[1],'will be used.'))
@@ -67,7 +67,7 @@ get_mean_pollution <- function(df, time_unit = c('month', 'year')) {
     purrr::map2(., v,  ~dplyr::select(.x, {.y})) %>%
     purrr::reduce(., dplyr::bind_cols)
 
-  d_nopoll <- dplyr::select(df, !all_of(v))
+  d_nopoll <- dplyr::select(df, !dplyr::all_of(v))
   d_poll <- dplyr::bind_cols(d_nopoll, d_na_poll)
 
 
@@ -76,7 +76,8 @@ get_mean_pollution <- function(df, time_unit = c('month', 'year')) {
     d %>%
       dplyr::group_by(subjectid, dplyr::across({{grp}})) %>%
       dplyr::summarise(dplyr::across(c(pm25, no2, o3), mean, .names = '{.col}_{time_unit}'),
-                       n_days = dplyr::n())
+                       n_days = dplyr::n()) %>%
+      dplyr::ungroup()
   }
 
   d_mean <- air_means_i(d_poll, time_unit = time_unit, grp = all_of(t_grp))
