@@ -46,14 +46,16 @@ get_prenatal_means <- function(df) {
   #### cosine, decade, etc
 
   d_etc <- d_gest %>%
+    dplyr::group_by(subjectid) %>%
     dplyr::filter(dplyr::row_number() == 1) %>%
+    dplyr::ungroup() %>%
     dplyr::transmute(gest_age = gest_age,
                      dob_sine = sin(2*pi*lubridate::yday(dob)/365.25),
                      dob_cos = cos(2*pi*lubridate::yday(dob)/365.25),
                      decade_born = lubridate::year(lubridate::floor_date(dob, lubridate::years(10))),
                      dob_season = dplyr::case_when(lubridate::month(dob) %in% c(3, 4, 5) ~ 1,
                                                    lubridate::month(dob) %in% c(6, 7, 8) ~ 2,
-                                                   lubridate::month(dob) %in% c(8, 9, 10) ~ 3,
+                                                   lubridate::month(dob) %in% c(9, 10, 11) ~ 3,
                                                    lubridate::month(dob) %in% c(1, 2, 12) ~ 4))
 
   d_prenatal <- dplyr::bind_cols(pre_means, d_etc)
@@ -71,5 +73,7 @@ get_prenatal_means <- function(df) {
                   dob_cos, decade_born)
 
   d_prenatal
+
+
 }
 
