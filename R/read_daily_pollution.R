@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' read_daily_pollution(path, n_lines = NULL)
 #' }
 #'
@@ -128,32 +128,52 @@ read_daily_pollution <- function(path, n_lines = NULL) {
 
   if (sum(purrr::map_lgl(d_poll$date, lubridate::is.Date)) == 0) {
 
+    m_date <- menu(c('month/day/year', 'year/month/day'), title = paste0('Column `date` was not automatically parsed as a date field.',
+                                                  ' Please select the date format.',
+                                                  '\n Select "0" to exit this menu.'))
 
-    date_guess <- lubridate::guess_formats(d_poll$date, orders = c('ymd', 'mdy'))
-    date_guess <- unique(stringr::str_replace_all(date_guess, '[[:punct:]O]', ''))
-
-    if (stringr::str_to_lower(date_guess) == 'ymd') {
-      d_poll$date <- lubridate::ymd(d_poll$date)
-    } else if (stringr::str_to_lower(date_guess) == 'mdy') {
-      d_poll$date <- lubridate::mdy(d_poll$date)
-    } else {
-      stop('Column `date` could not be parsed. Please check the format.')
+    if (m_date == 0) {
+      stop('Operation terminated. Please checck the date format.',
+           call. = FALSE)
     }
+
+
+    if (m_date == 1) {
+      d_poll$date <- lubridate::mdy(d_poll$date)
+    } else if (m_date == 2) {
+      d_poll$date <- lubridate::ymd(d_poll$date)
+    } else {
+      stop('Column `date` could not be parsed. Please check the format of `date`.')
+    }
+
+    m_date_f <- c('month/day/year', 'year/month/day')[m_date]
+
+    message(paste0('Column `date` has been formatted to: "', m_date_f, '"'))
   }
 
   if (sum(purrr::map_lgl(d_poll$dob, lubridate::is.Date)) == 0) {
 
 
-    dob_guess <- lubridate::guess_formats(d_poll$dob, orders = c('ymd', 'mdy'))
-    dob_guess <- unique(stringr::str_replace_all(dob_guess, '[[:punct:]O]', ''))
+    m_dob <- menu(c('month/day/year', 'year/month/day'), title = paste0('Column `dob` was not automatically parsed as a date field.',
+                                                                         ' Please select the date format..',
+                                                                         '\n Select "0" to exit this menu.'))
 
-    if (stringr::str_to_lower(dob_guess) == 'ymd') {
-      d_poll$dob <- lubridate::ymd(d_poll$dob)
-    } else if (stringr::str_to_lower(dob_guess) == 'mdy') {
-      d_poll$dob <- lubridate::mdy(d_poll$dob)
-    } else {
-      stop('Column `dob` could not be parsed. Please check the format.')
+    if (m_dob == 0) {
+      stop('Operation terminated. Please checck the date format of `dob`.',
+           call. = FALSE)
     }
+
+    if (m_dob == 1) {
+      d_poll$dob <- lubridate::mdy(d_poll$dob)
+    } else if (m_dob == 2) {
+      d_poll$dob <- lubridate::ymd(d_poll$dob)
+    } else {
+      stop('Column `date` could not be parsed. Please check the format.')
+    }
+
+    m_dob_f <- c('month/day/year', 'year/month/day')[m_dob]
+
+    message(paste0('Column `date` has been formatted to: "', m_dob_f, '"'))
   }
 
   d_poll <- d_poll %>% dplyr::relocate(subjectid, dob, date, pm25, no2, o3)

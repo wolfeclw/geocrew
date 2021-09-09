@@ -24,7 +24,7 @@ the corresponding variables in the input data frame.
 columns are not present
 }
 \examples{
-\dontrun {
+\dontrun{
 read_daily_pollution(path, n_lines = NULL)
 }
 

@@ -2,7 +2,7 @@
 #' Clean and prepare daily air pollution data
 #'
 #' @param d a data frame with daily air pollution measurements
-#' @param cohort character; name of cohort or study
+#' @param cohort_name character; name of cohort or study
 #'
 #' @return a data frame
 #' @export

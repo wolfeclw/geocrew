@@ -16,6 +16,10 @@ get_prenatal_means <- function(df) {
     stop('Column `gest_age` not found.')
   }
 
+  if (sum(is.na(df$gest_age)) > 1) {
+    stop('Gestational age is missing for some or all of the rows of the input data frame.')
+  }
+
   d_gest <- dplyr::filter(df, date <= dob)
 
   ### find prenatal intervals
@@ -72,8 +76,12 @@ get_prenatal_means <- function(df) {
                   o3_avg14_n, o3_avg30, o3_avg30_n, o3_avg60, o3_avg60_n, o3_avg90, o3_avg90_n, dob_season, dob_sine,
                   dob_cos, decade_born)
 
-  d_prenatal
+  if ('cohort' %in% names(df)) {
+    d_prenatal$cohort <- unique(df$cohort)
+    d_prenatal <- d_prenatal %>% dplyr::relocate(cohort)
+  }
 
+  d_prenatal
 
 }
 

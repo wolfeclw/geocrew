@@ -1,5 +1,5 @@
 Package: geocrew
-Title: What the Package Does (One Line, Title Case)
+Title: Calculate Prenatal, Monthly, and Yearly Averages for Daily Pollution Measurements of CREW Cohorts
 Version: 0.1
 Authors@R: 
     person(given = "Chris",
@@ -14,4 +14,13 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
-    magrittr
+    magrittr,
+    readr,
+    purrr,
+    dplyr,
+    tidyr,
+    lubridate,
+    readxl,
+    stringr,
+    tibble,
+    crayon

@@ -7,9 +7,9 @@
 get_monyr_means(df, time_unit = c("month", "year"))
 }
 \arguments{
-\item{time_unit}{character; averaging interval ('prenatal', 'month", 'year')}
+\item{df}{a data frame created by \code{prepdata()}}
 
-\item{d}{a data frame created by \code{prepdata()}}
+\item{time_unit}{character; averaging interval ('prenatal', 'month", 'year')}
 }
 \value{
 a data frame

@@ -3,3 +3,6 @@
 ^geocrew\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
+test_data
+test_funs
+ccaaps_sas_output

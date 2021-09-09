@@ -9,7 +9,7 @@ prepdata(d, cohort_name = NULL)
 \arguments{
 \item{d}{a data frame with daily air pollution measurements}
 
-\item{cohort}{character; name of cohort or study}
+\item{cohort_name}{character; name of cohort or study}
 }
 \value{
 a data frame

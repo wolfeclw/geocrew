@@ -1,7 +1,7 @@
 
 #' Calculate mean air pollution levels by a specific time interval
 #'
-#' @param d a data frame created by `prepdata()`
+#' @param df a data frame created by `prepdata()`
 #' @param time_unit character; averaging interval ('prenatal', 'month", 'year')
 #'
 #' @return a data frame
@@ -89,7 +89,15 @@ get_monyr_means <- function(df, time_unit = c('month', 'year')) {
 
   d_sumry <- dplyr::bind_cols(d_mean, dn)
 
-  d_sumry %>%
-    dplyr::select(subjectid, dplyr::starts_with({{time_unit}}), dplyr::starts_with('no2'), dplyr::starts_with('pm25'), dplyr::starts_with('o3'))
+  d_sumry <- d_sumry %>%
+    dplyr::select(subjectid, dplyr::starts_with({{time_unit}}),
+                  dplyr::starts_with('no2'),
+                  dplyr::starts_with('pm25'),
+                  dplyr::starts_with('o3'))
 
+  if ('cohort' %in% names(df)) {
+    d_sumry$cohort <- unique(df$cohort)
+  }
+
+  d_sumry
 }
