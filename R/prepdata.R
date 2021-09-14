@@ -15,6 +15,8 @@
 #'
 prepdata <- function(d, cohort_name = NULL) {
 
+  Sys.sleep(3)
+
   if (!'gest_age' %in% names(d)) {
     message('Could not find column `gest_age`. This column has been added to the export data frame. ')
     d$gest_age <- NA

@@ -13,11 +13,12 @@
 get_prenatal_means <- function(df) {
 
   if (!'gest_age' %in% names(df)) {
-    stop('Column `gest_age` not found.')
+    stop('Column `gest_age` not found.', call. = FALSE)
   }
 
   if (sum(is.na(df$gest_age)) > 1) {
-    stop('Gestational age is missing for some or all of the rows of the input data frame.')
+    stop('Gestational age is missing for some or all of the rows of the input data frame.',
+         call. = FALSE)
   }
 
   d_gest <- dplyr::filter(df, date <= dob)

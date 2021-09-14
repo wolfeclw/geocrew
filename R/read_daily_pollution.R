@@ -42,7 +42,7 @@ read_daily_pollution <- function(path, n_lines = NULL) {
 
   poll_names <- names(d_poll)
 
-## rename ID column
+  ## rename ID column
 
   if (!'subjectid' %in% poll_names) {
     m_names <- menu(names(d_poll), title = paste0('Column `subjectid` is not in the input data frame.',
@@ -64,7 +64,7 @@ read_daily_pollution <- function(path, n_lines = NULL) {
     message(paste0('Column `', id_rename, '` has been renamed to `subjectid`.'))
   }
 
-## rename date
+  ## rename date
 
   if (!'date' %in% poll_names) {
     m_names <- menu(names(d_poll), title = paste0('Column `date` is not in the input data frame.',
@@ -86,7 +86,7 @@ read_daily_pollution <- function(path, n_lines = NULL) {
     message(paste0('Column `', id_rename, '` has been renamed to `date`.'))
   }
 
-## rename DOB
+  ## rename DOB
 
   if (!'dob' %in% poll_names) {
     m_names <- menu(names(d_poll), title = paste0('Column `dob` is not in the input data frame.',
@@ -126,11 +126,11 @@ read_daily_pollution <- function(path, n_lines = NULL) {
 
   no_match
 
-  if (sum(purrr::map_lgl(d_poll$date, lubridate::is.Date)) == 0) {
+  if (sum(purrr::map_lgl(d_poll$date, lubridate::is.POSIXct)) == 0) {
 
     m_date <- menu(c('month/day/year', 'year/month/day'), title = paste0('Column `date` was not automatically parsed as a date field.',
-                                                  ' Please select the date format.',
-                                                  '\n Select "0" to exit this menu.'))
+                                                                         ' Please select the date format.',
+                                                                         '\n Select "0" to exit this menu.'))
 
     if (m_date == 0) {
       stop('Operation terminated. Please checck the date format.',
@@ -149,15 +149,16 @@ read_daily_pollution <- function(path, n_lines = NULL) {
     m_date_f <- c('month/day/year', 'year/month/day')[m_date]
 
     message(paste0('Column `date` has been formatted to: "', m_date_f, '"'))
+  } else {
+    d_poll$date <- lubridate::as_date(d_poll$date)
   }
 
-  if (sum(purrr::map_lgl(d_poll$dob, lubridate::is.Date)) == 0) {
+  if (sum(purrr::map_lgl(d_poll$dob, lubridate::is.POSIXct)) == 0) {
 
 
     m_dob <- menu(c('month/day/year', 'year/month/day'), title = paste0('Column `dob` was not automatically parsed as a date field.',
-                                                                         ' Please select the date format..',
-                                                                         '\n Select "0" to exit this menu.'))
-
+                                                                        ' Please select the date format..',
+                                                                        '\n Select "0" to exit this menu.'))
     if (m_dob == 0) {
       stop('Operation terminated. Please checck the date format of `dob`.',
            call. = FALSE)
@@ -168,12 +169,14 @@ read_daily_pollution <- function(path, n_lines = NULL) {
     } else if (m_dob == 2) {
       d_poll$dob <- lubridate::ymd(d_poll$dob)
     } else {
-      stop('Column `date` could not be parsed. Please check the format.')
+      stop('Column `dob` could not be parsed. Please check the format.')
     }
 
     m_dob_f <- c('month/day/year', 'year/month/day')[m_dob]
 
-    message(paste0('Column `date` has been formatted to: "', m_dob_f, '"'))
+    message(paste0('Column `dob` has been formatted to: "', m_dob_f, '"'))
+  } else {
+    d_poll$dob <- lubridate::as_date(d_poll$dob)
   }
 
   d_poll <- d_poll %>% dplyr::relocate(subjectid, dob, date, pm25, no2, o3)
