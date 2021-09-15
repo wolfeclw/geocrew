@@ -44,7 +44,7 @@ get_prenatal_means <- function(df) {
   pre_intervals <- purrr::map(l_intervals, pre_interval_i)
 
   ### calculate means
-  pre_means <- purrr::map(pre_intervals, ~pre_means_s(., int_names))
+  pre_means <- purrr::map(pre_intervals, ~pre_means_i(., int_names))
   pre_means <- suppressMessages(purrr::map_depth(pre_means, 1, ~purrr::reduce(., dplyr::inner_join))) %>%
     dplyr::bind_rows()
 
