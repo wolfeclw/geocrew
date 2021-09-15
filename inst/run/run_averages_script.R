@@ -120,7 +120,8 @@ if ('prenatal' %in% averaging_options$average_type) {
 ###
 
 message(crayon::green('All done!'))
-message(crayon::green(paste0('The exported data tables are here: ', averaging_options$export_path, '.')))
+message(crayon::green(paste0('The exported data tables are here: ',
+                             crayon::cyan(averaging_options$export_path), '.')))
 
 rm(averaging_options, calc_hour, calc_mins, calc_text, calc_time, prep_time, pre_time)
 

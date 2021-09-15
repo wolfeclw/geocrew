@@ -17,6 +17,10 @@
 run_averages <- function(input_path = NULL, export_path = NULL, average_type = 'all', cohort = NULL) {
 
 
+  if (!dir.exists(export_path)) {
+    stop(paste('Directory', crayon::cyan(export_path), 'does not exist. \n Check the export path.'),
+         call. = FALSE)
+  }
   pipe_file <- system.file('run', 'run_averages_script.R', package = 'geocrew')
 
   avg_param <- list(input_path = input_path,
