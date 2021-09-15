@@ -51,11 +51,8 @@ message(crayon::green(paste('Sit back and relax. By my calculations, this will t
 
 d_prepared <- prepdata(d_poll, cohort_name = averaging_options$cohort)
 
-d_prepared$gest_age <- 245
 
 ### calculate specified averages
-
-
 
 if (sum(averaging_options$average_type == 'all') > 0) {
 
