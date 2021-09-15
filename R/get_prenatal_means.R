@@ -13,12 +13,16 @@
 get_prenatal_means <- function(df) {
 
   if (!'gest_age' %in% names(df)) {
-    stop('Column `gest_age` not found.', call. = FALSE)
+    stop('Column `gest_age` not found. Did you use `prepdata()` to create the input data frame?', call. = FALSE)
   }
 
-  if (sum(is.na(df$gest_age)) > 1) {
-    stop('Gestational age is missing for some or all of the rows of the input data frame.',
-         call. = FALSE)
+  if (sum(is.na(df$gest_age)) == nrow(df)) {
+
+    message('Gestatinal age is missing for all rows. Trimester averages were not calculated.')
+
+  } else if (sum(is.na(df$gest_age)) > 1) {
+
+    message('Gestational age is missing for some rows of the input data frame. Prenatal averages were not calculated \n for all participants.' )
   }
 
   d_gest <- dplyr::filter(df, date <= dob)
@@ -40,13 +44,17 @@ get_prenatal_means <- function(df) {
   pre_intervals <- purrr::map(l_intervals, pre_interval_i)
 
   ### calculate means
-  pre_means <- purrr::map(pre_intervals, ~purrr::map2(., int_names, ~pre_means_i(.x, .y)))
-  pre_means <- suppressMessages(purrr::map_depth(pre_means, 1, ~purrr::reduce(., dplyr::inner_join)))
+  pre_means <- purrr::map(pre_intervals, ~pre_means_s(., int_names))
+  pre_means <- suppressMessages(purrr::map_depth(pre_means, 1, ~purrr::reduce(., dplyr::inner_join))) %>%
+    dplyr::bind_rows()
 
-  pre_means <- purrr::map_df(pre_means, ~dplyr::mutate(.,
-                                         length_tri1 = pm25_tri1_n,
-                                         length_tri2 = pm25_tri2_n,
-                                         length_tri3 = pm25_tri3_n))
+  if ('pm25_tri1_n' %in% names(pre_means)) {
+    pre_means <- pre_means %>%
+      dplyr::mutate(length_tri1 = pm25_tri1_n,
+                    length_tri2 = pm25_tri2_n,
+                    length_tri3 = pm25_tri3_n)
+  }
+
 
   #### cosine, decade, etc
 

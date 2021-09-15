@@ -25,19 +25,30 @@ find_pre_intervals <- function(df) {
 
 
 ### calculate means
-pre_means_i <- function(l_intervals, time_unit) {
+pre_means_i <- function(l, ints) {
 
-  tu <- stringr::str_split(time_unit, '_')
-  tu <- purrr::map_chr(tu, 1)
+  l_empty <- purrr::map_lgl(l, ~nrow(.) == 0)
 
-  l_intervals %>%
-    dplyr::group_by(subjectid, dplyr::across({{time_unit}})) %>%
-    dplyr::mutate(across(dplyr::starts_with(c('pm25', 'no2', 'o3')), ~max(dplyr::row_number()),
-                         .names = "{col}_{time_unit}_n")) %>%
-    dplyr::rename_with(~stringr::str_replace_all(., '_int_n', '_n')) %>%
-    dplyr::summarise(dplyr::across(dplyr::starts_with(c('pm25', 'no2', 'o3')), mean, .names = '{.col}_{tu}'),
-                     .groups = 'drop') %>%
-    dplyr::ungroup() %>%
-    dplyr::select_if(~!lubridate::is.interval(.x)) %>%
-    dplyr::rename_with(~stringr::str_replace_all(., paste('n', tu, sep = '_'), 'n'))
+  d_int_not_empty <- l[!l_empty]
+  avail_ints <- ints[!l_empty]
+
+
+  pre_means_by_int <- function(d_int, time_unit) {
+
+    tu <- stringr::str_split(time_unit, '_')
+    tu <- purrr::map_chr(tu, 1)
+
+    d_int %>%
+      dplyr::group_by(subjectid, dplyr::across({{time_unit}})) %>%
+      dplyr::mutate(across(dplyr::starts_with(c('pm25', 'no2', 'o3')), ~max(dplyr::row_number()),
+                           .names = "{col}_{time_unit}_n")) %>%
+      dplyr::rename_with(~stringr::str_replace_all(., '_int_n', '_n')) %>%
+      dplyr::summarise(dplyr::across(dplyr::starts_with(c('pm25', 'no2', 'o3')), mean, .names = '{.col}_{tu}'),
+                       .groups = 'drop') %>%
+      dplyr::ungroup() %>%
+      dplyr::select_if(~!lubridate::is.interval(.x)) %>%
+      dplyr::rename_with(~stringr::str_replace_all(., paste('n', tu, sep = '_'), 'n'))
+  }
+
+  purrr::map2(d_int_not_empty, avail_ints, ~pre_means_by_int(.x, .y))
 }

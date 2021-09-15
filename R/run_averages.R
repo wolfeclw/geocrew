@@ -17,7 +17,7 @@
 run_averages <- function(input_path = NULL, export_path = NULL, average_type = 'all', cohort = NULL) {
 
 
-  pipe_file <- system.file('run', 'run_averages_scropt.R', package = 'geocrew')
+  pipe_file <- system.file('run', 'run_averages_script.R', package = 'geocrew')
 
   avg_param <- list(input_path = input_path,
                     export_path = export_path,
