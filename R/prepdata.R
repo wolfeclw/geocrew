@@ -57,17 +57,17 @@ prepdata <- function(d, cohort_name = NULL) {
     dplyr::group_split(subjectid, month_since_birth) %>%
     purrr::map_df(.,
                   ~dplyr::mutate(.,
-                           b_max = max(b_days),
-                           e_max = max(e_days),
-                           f_date = dplyr::first(date),
-                           l_date = dplyr::last(date),
-                           interval_max = lubridate::interval(f_date, l_date),
-                           lub_days = lubridate::days(l_date - f_date),
-                           lub_days = lubridate::day(lub_days) + 1,
-                           n_days_month = ifelse(b_max < lub_days | e_max < lub_days,
-                                                 lubridate::days_in_month(date), lub_days),
-                           mo_days = dplyr::n()))  %>%
-    dplyr::group_split(subjectid, year_since_birth) %>%
+                                 b_max = max(b_days),
+                                 e_max = max(e_days),
+                                 f_date = dplyr::first(date),
+                                 l_date = dplyr::last(date),
+                                 interval_max = lubridate::interval(f_date, l_date),
+                                 mo_days = dplyr::n(),
+                                 lub_days = lubridate::days(l_date - f_date),
+                                 lub_days = lubridate::day(lub_days) + 1,
+                                 n_days_month = ifelse(b_max < lub_days | e_max < lub_days | mo_days < 23,
+                                                       lubridate::days_in_month(date), lub_days)))  %>%
+                    dplyr::group_split(subjectid, year_since_birth) %>%
     purrr::map_df(.,
            ~dplyr::mutate(.,
                    yr_interval = lubridate::interval(dplyr::first(date), dplyr::last(date)),
