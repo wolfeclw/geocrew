@@ -35,7 +35,7 @@ read_daily_pollution <- function(path, n_lines = NULL) {
   } else if (p_ext == 'xls') {
     d_poll <- readxl::read_xls(path, n_max = read_n_lines)
   } else if (p_ext == 'csv') {
-    d_poll <- readr::read_csv(path, n_max = read_n_lines, show_col_types = FALSE, pro = readr::show_progress())
+    d_poll <- readr::read_csv(path, n_max = read_n_lines, show_col_types = FALSE, progress = readr::show_progress())
   }
 
   d_poll <- dplyr::rename_with(d_poll, stringr::str_to_lower)
