@@ -38,10 +38,25 @@ pre_means_i <- function(l, ints) {
     tu <- stringr::str_split(time_unit, '_')
     tu <- purrr::map_chr(tu, 1)
 
-    d_int %>%
+    d_na <- d_int %>%
       dplyr::group_by(subjectid, dplyr::across({{time_unit}})) %>%
-      dplyr::mutate(across(dplyr::starts_with(c('pm25', 'no2', 'o3')), ~max(dplyr::row_number()),
-                           .names = "{col}_{time_unit}_n")) %>%
+      dplyr::mutate(dplyr::across(c(pm25, no2, o3), ~max(dplyr::row_number()),
+                           .names = "{col}_{time_unit}_n"),
+                    dplyr::across(c(pm25, no2, o3), ~sum(is.na(.)), .names = '{col}_na_n'))
+
+    v <- v <- names(d_na)
+
+    v_int <- v[stringr::str_detect(v, 'int_n')]
+    v_na <- v[stringr::str_detect(v, 'na_n')]
+
+    d_na <- purrr::map2(v_na, v_int, ~dplyr::mutate(d_na, dplyr::across(.x, ~ (.data[[.y]] - . )/ .data[[.y]], .names = '{col}_pct')))
+    d_na <- suppressMessages(purrr::reduce(d_na, dplyr::inner_join))
+
+    d_avg <- d_na %>%
+      dplyr::mutate(pm25 = ifelse(pm25_na_n_pct < 0.75, NA, pm25),
+             no2 = ifelse(no2_na_n_pct < 0.75, NA, no2),
+             o3 = ifelse(o3_na_n_pct < 0.75, NA, o3)) %>%
+      dplyr::select(-dplyr::ends_with('na_n_pct')) %>%
       dplyr::rename_with(~stringr::str_replace_all(., '_int_n', '_n')) %>%
       dplyr::summarise(dplyr::across(dplyr::starts_with(c('pm25', 'no2', 'o3')), mean, .names = '{.col}_{tu}'),
                        .groups = 'drop') %>%
