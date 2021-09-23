@@ -12,7 +12,7 @@ read_daily_pollution(path, n_lines = NULL)
 \item{n_lines}{numeric; number of lines of input data frame to read.  This is useful to preview the data.}
 }
 \value{
-
+a data frame with properly named and formatted date variables.
 }
 \description{
 \code{read_daily_pollution} can read both .CSV and .xlsx formats.  Date columns for

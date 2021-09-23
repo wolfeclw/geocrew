@@ -10,7 +10,7 @@
 #' @param path character; folder path of input data frame
 #' @param n_lines numeric; number of lines of input data frame to read.  This is useful to preview the data.
 #'
-#' @return
+#' @return a data frame with properly named and formatted date variables.
 #'
 #' @export
 #'
