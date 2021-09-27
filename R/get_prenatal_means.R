@@ -71,38 +71,56 @@ get_prenatal_means <- function(df) {
                                                    lubridate::month(dob) %in% c(9, 10, 11) ~ 3,
                                                    lubridate::month(dob) %in% c(1, 2, 12) ~ 4))
 
-  d_prenatal <- dplyr::bind_cols(pre_means, d_etc)
+  if (nrow(pre_means) > 0) {
 
-  if ('pm25_tri1_n' %in% names(d_prenatal)) {
-
-  d_prenatal <- d_prenatal %>%
-    dplyr::select(subjectid, gest_age, length_tri1, length_tri2, length_tri3, no2_tri1, no2_tri1_n, no2_tri2,
-                  no2_tri2_n, no2_tri3, no2_tri3_n, pm25_tri1, pm25_tri1_n, pm25_tri2, pm25_tri2_n, pm25_tri3,
-                  pm25_tri3_n, o3_tri1, o3_tri1_n, o3_tri2, o3_tri2_n, o3_tri3, o3_tri3_n, no2_avg2, no2_avg2_n,
-                  no2_avg3, no2_avg3_n, no2_avg4, no2_avg4_n, no2_avg5, no2_avg5_n, no2_avg6, no2_avg6_n, no2_avg7,
-                  no2_avg7_n, no2_avg14, no2_avg14_n, no2_avg30, no2_avg30_n, no2_avg60, no2_avg60_n, no2_avg90,
-                  no2_avg90_n, pm25_avg2, pm25_avg2_n, pm25_avg3, pm25_avg3_n, pm25_avg4, pm25_avg4_n, pm25_avg5,
-                  pm25_avg5_n, pm25_avg6, pm25_avg6_n, pm25_avg7, pm25_avg7_n, pm25_avg14, pm25_avg14_n, pm25_avg30,
-                  pm25_avg30_n, pm25_avg60, pm25_avg60_n, pm25_avg90, pm25_avg90_n, o3_avg2, o3_avg2_n, o3_avg3,
-                  o3_avg3_n, o3_avg4, o3_avg4_n, o3_avg5, o3_avg5_n, o3_avg6, o3_avg6_n, o3_avg7, o3_avg7_n, o3_avg14,
-                  o3_avg14_n, o3_avg30, o3_avg30_n, o3_avg60, o3_avg60_n, o3_avg90, o3_avg90_n, dob_season, dob_sine,
-                  dob_cos, decade_born)
+    d_prenatal <- dplyr::bind_cols(pre_means, d_etc)
   } else {
-    d_prenatal <- d_prenatal %>%
-      dplyr::select(subjectid, gest_age, no2_avg2, no2_avg2_n, no2_avg3, no2_avg3_n, no2_avg4, no2_avg4_n, no2_avg5,
-                    no2_avg5_n, no2_avg6, no2_avg6_n, no2_avg7,
-                    no2_avg7_n, no2_avg14, no2_avg14_n, no2_avg30, no2_avg30_n, no2_avg60, no2_avg60_n, no2_avg90,
-                    no2_avg90_n, pm25_avg2, pm25_avg2_n, pm25_avg3, pm25_avg3_n, pm25_avg4, pm25_avg4_n, pm25_avg5,
-                    pm25_avg5_n, pm25_avg6, pm25_avg6_n, pm25_avg7, pm25_avg7_n, pm25_avg14, pm25_avg14_n, pm25_avg30,
-                    pm25_avg30_n, pm25_avg60, pm25_avg60_n, pm25_avg90, pm25_avg90_n, o3_avg2, o3_avg2_n, o3_avg3,
-                    o3_avg3_n, o3_avg4, o3_avg4_n, o3_avg5, o3_avg5_n, o3_avg6, o3_avg6_n, o3_avg7, o3_avg7_n, o3_avg14,
-                    o3_avg14_n, o3_avg30, o3_avg30_n, o3_avg60, o3_avg60_n, o3_avg90, o3_avg90_n, dob_season, dob_sine,
-                    dob_cos, decade_born)
+    d_prenatal <- d_etc
+  }
+
+  if (nrow(pre_means > 0)) {
+
+    if ('pm25_tri1_n' %in% names(d_prenatal)) {
+
+      d_prenatal <- d_prenatal %>%
+        dplyr::select(subjectid, gest_age, length_tri1, length_tri2, length_tri3, no2_tri1, no2_tri1_n, no2_tri2,
+                      no2_tri2_n, no2_tri3, no2_tri3_n, pm25_tri1, pm25_tri1_n, pm25_tri2, pm25_tri2_n, pm25_tri3,
+                      pm25_tri3_n, o3_tri1, o3_tri1_n, o3_tri2, o3_tri2_n, o3_tri3, o3_tri3_n, no2_avg2, no2_avg2_n,
+                      no2_avg3, no2_avg3_n, no2_avg4, no2_avg4_n, no2_avg5, no2_avg5_n, no2_avg6, no2_avg6_n, no2_avg7,
+                      no2_avg7_n, no2_avg14, no2_avg14_n, no2_avg30, no2_avg30_n, no2_avg60, no2_avg60_n, no2_avg90,
+                      no2_avg90_n, pm25_avg2, pm25_avg2_n, pm25_avg3, pm25_avg3_n, pm25_avg4, pm25_avg4_n, pm25_avg5,
+                      pm25_avg5_n, pm25_avg6, pm25_avg6_n, pm25_avg7, pm25_avg7_n, pm25_avg14, pm25_avg14_n, pm25_avg30,
+                      pm25_avg30_n, pm25_avg60, pm25_avg60_n, pm25_avg90, pm25_avg90_n, o3_avg2, o3_avg2_n, o3_avg3,
+                      o3_avg3_n, o3_avg4, o3_avg4_n, o3_avg5, o3_avg5_n, o3_avg6, o3_avg6_n, o3_avg7, o3_avg7_n, o3_avg14,
+                      o3_avg14_n, o3_avg30, o3_avg30_n, o3_avg60, o3_avg60_n, o3_avg90, o3_avg90_n, dob_season, dob_sine,
+                      dob_cos, decade_born)
+    } else {
+      d_prenatal <- d_prenatal %>%
+        dplyr::select(subjectid, gest_age, no2_avg2, no2_avg2_n, no2_avg3, no2_avg3_n, no2_avg4, no2_avg4_n, no2_avg5,
+                      no2_avg5_n, no2_avg6, no2_avg6_n, no2_avg7,
+                      no2_avg7_n, no2_avg14, no2_avg14_n, no2_avg30, no2_avg30_n, no2_avg60, no2_avg60_n, no2_avg90,
+                      no2_avg90_n, pm25_avg2, pm25_avg2_n, pm25_avg3, pm25_avg3_n, pm25_avg4, pm25_avg4_n, pm25_avg5,
+                      pm25_avg5_n, pm25_avg6, pm25_avg6_n, pm25_avg7, pm25_avg7_n, pm25_avg14, pm25_avg14_n, pm25_avg30,
+                      pm25_avg30_n, pm25_avg60, pm25_avg60_n, pm25_avg90, pm25_avg90_n, o3_avg2, o3_avg2_n, o3_avg3,
+                      o3_avg3_n, o3_avg4, o3_avg4_n, o3_avg5, o3_avg5_n, o3_avg6, o3_avg6_n, o3_avg7, o3_avg7_n, o3_avg14,
+                      o3_avg14_n, o3_avg30, o3_avg30_n, o3_avg60, o3_avg60_n, o3_avg90, o3_avg90_n, dob_season, dob_sine,
+                      dob_cos, decade_born)
+    }
   }
 
   if ('cohort' %in% names(df)) {
     d_prenatal$cohort <- unique(df$cohort)
     d_prenatal <- d_prenatal %>% dplyr::relocate(cohort)
+  }
+
+  ### message indicating prenatal values missing because DOB < 2000
+
+  na_prenatal <- purrr::map(l_intervals, `[`, c('pm25', 'no2', 'o3')) %>%
+    purrr::map_lgl(., ~sum(is.na(.)) == nrow(.)*3) %>%
+    sum(.)
+
+  if (na_prenatal > 0) {
+    message('Some or all average values for prenatal intervals were not calculated due to missing pollution data prior to birth.')
   }
 
   d_prenatal
