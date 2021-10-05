@@ -46,7 +46,8 @@ get_monyr_means <- function(df, time_unit = c('month', 'year')) {
             c('pm25', 'o3'),
             c('pm25', 'no2'))
 
-  l_poll <- purrr::map(l, ~dplyr::select(df, subjectid, !.))
+  l_poll <- purrr::map(l, ~dplyr::select(df, subjectid, !.)) %>%
+    purrr::map(., ~dplyr::arrange(., date))
 
   ## find and count NA values for each pollution meausrement
   air_na_i <- function(d, time_unit, grp, poll_var) {

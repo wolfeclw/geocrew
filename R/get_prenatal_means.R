@@ -25,7 +25,8 @@ get_prenatal_means <- function(df) {
     message('Gestational age is missing for some rows of the input data frame. Prenatal averages were not calculated \n for all participants.' )
   }
 
-  d_gest <- dplyr::filter(df, date <= dob)
+  d_gest <- dplyr::filter(df, date <= dob) %>%
+    dplyr::arrange(subjectid, date)
 
   ### find prenatal intervals
   d_intervals <- find_pre_intervals(d_gest)
@@ -62,7 +63,8 @@ get_prenatal_means <- function(df) {
     dplyr::group_by(subjectid) %>%
     dplyr::filter(dplyr::row_number() == 1) %>%
     dplyr::ungroup() %>%
-    dplyr::transmute(gest_age = gest_age,
+    dplyr::transmute(subjectid = subjectid,
+                     gest_age = gest_age,
                      dob_sine = sin(2*pi*lubridate::yday(dob)/365.25),
                      dob_cos = cos(2*pi*lubridate::yday(dob)/365.25),
                      decade_born = lubridate::year(lubridate::floor_date(dob, lubridate::years(10))),
@@ -73,9 +75,9 @@ get_prenatal_means <- function(df) {
 
   if (nrow(pre_means) > 0) {
 
-    d_prenatal <- dplyr::bind_cols(pre_means, d_etc)
+    d_prenatal <- dplyr::full_join(pre_means, d_etc, "subjectid") %>% dplyr::arrange(subjectid)
   } else {
-    d_prenatal <- d_etc
+    d_prenatal <- d_etc %>% dplyr::arrange(subjectid)
   }
 
   if (nrow(pre_means > 0)) {
@@ -120,7 +122,7 @@ get_prenatal_means <- function(df) {
     sum(.)
 
   if (na_prenatal > 0) {
-    message('Some or all average values for prenatal intervals were not calculated due to missing pollution data prior to birth.')
+    message(crayon::red('Some or all average values for prenatal intervals were not calculated due to missing pollution data prior to birth.'))
   }
 
   d_prenatal

@@ -12,6 +12,13 @@ if (sum(averaging_options$average_type %in% c('all', 'month', 'year', 'prenatal'
        call. = FALSE)
 }
 
+### NA value .CSV files
+
+if (averaging_options$na_SAS == FALSE) {
+  na_value <- 'NA'
+} else if (averaging_options$na_SAS == TRUE) {
+  na_value <- '.'
+}
 
 ### read pollution file
 
@@ -68,9 +75,12 @@ if (sum(averaging_options$average_type == 'all') > 0) {
   d_prenatal <- get_prenatal_means(d_prepared)
 
   ### write output
-  readr::write_csv(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.csv'))
-  readr::write_csv(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.csv'))
-  readr::write_csv(d_prenatal, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_prenatal.csv'))
+  readr::write_csv(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.csv'),
+                   na = na_value)
+  readr::write_csv(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.csv'),
+                                  na = na_value)
+  readr::write_csv(d_prenatal, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_prenatal.csv'),
+                   na = na_value)
 
   readr::write_rds(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.rds'))
   readr::write_rds(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.rds'))
@@ -85,7 +95,8 @@ if ('year' %in% averaging_options$average_type) {
   Sys.sleep(3)
 
   d_year <- get_monyr_means(d_prepared, 'year')
-  readr::write_csv(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.csv'))
+  readr::write_csv(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.csv'),
+                   na = na_value)
   readr::write_rds(d_year, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_year.rds'))
 
 }
@@ -97,7 +108,8 @@ if ('month' %in% averaging_options$average_type) {
   Sys.sleep(3)
 
   d_month <- get_monyr_means(d_prepared, 'month')
-  readr::write_csv(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.csv'))
+  readr::write_csv(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.csv'),
+                   na = na_value)
   readr::write_rds(d_month, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_month.rds'))
 
 }
@@ -107,7 +119,8 @@ if ('prenatal' %in% averaging_options$average_type) {
   message(crayon::green('Calculating prenatal averages...'))
 
   d_prenatal <- get_prenatal_means(d_prepared)
-  readr::write_csv(d_prenatal, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_prenatal.csv'))
+  readr::write_csv(d_prenatal, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_prenatal.csv'),
+                   na = na_value)
   readr::write_rds(d_prenatal, paste0(averaging_options$export_path, '/', averaging_options$cohort, '_prenatal.rds'))
 
 

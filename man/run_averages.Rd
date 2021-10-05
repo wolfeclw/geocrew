@@ -8,7 +8,8 @@ run_averages(
   input_path = NULL,
   export_path = NULL,
   average_type = "all",
-  cohort = NULL
+  cohort = NULL,
+  na_SAS = FALSE
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ run_averages(
 Default = 'all'.}
 
 \item{cohort}{character; cohort name}
+
+\item{na_SAS}{logical; if TRUE, missing values will be replaced with '.' instead of 'NA.'
+Default = FALSE.}
 }
 \description{
 Execute averaging script by specific interval
