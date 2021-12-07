@@ -6,3 +6,7 @@ Calculate monthly, yearly, and prenatal averages from daily air pollution measur
 ```
 devtools::install_github(wolfeclw/geocrew)
 ```
+
+## Status
+
+THIS PACKAGE IS CURRENTLY IN DEVELOPMENT - USE WITH CAUTION UNTIL A VERSIONED RELEASE IS AVAILABLE!
