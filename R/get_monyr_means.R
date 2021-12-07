@@ -31,41 +31,34 @@ get_monyr_means <- function(df, time_unit = c('month', 'year')) {
          call. = FALSE)
   }
 
-  if (time_unit == 'month') {
-    df$pct_comp <- round(df$mo_days/df$n_days_month, digits = 2)
-  } else if (time_unit == 'year' ) {
-    df$pct_comp <- round(df$yr_days/df$n_days_year, digits = 2)
-  }
-
-  df[df$pct_comp < 0.75, 'pm25'] <- NA
-  df[df$pct_comp < 0.75, 'no2'] <- NA
-  df[df$pct_comp < 0.75, 'o3'] <- NA
-
   v <- c('pm25', 'no2', 'o3')
   l <- list(c('no2', 'o3'),
             c('pm25', 'o3'),
             c('pm25', 'no2'))
 
-  l_poll <- purrr::map(l, ~dplyr::select(df, subjectid, !.)) %>%
-    purrr::map(., ~dplyr::arrange(., date))
+  l_poll <- purrr::map(dplyr::all_of(l), ~dplyr::select(df, subjectid, !.)) %>%
+    purrr::map(., ~dplyr::arrange(., subjectid, date))
 
-  ## find and count NA values for each pollution meausrement
+  ## find and count NA values for each pollution measurement
   air_na_i <- function(d, time_unit, grp, poll_var) {
     d %>%
       dplyr::group_by(subjectid, dplyr::across({{grp}})) %>%
       dplyr::mutate(dplyr::across(c({{poll_var}}),
                                   ~sum(is.na(.)),
+                                  .names = '{poll_var}_n_na'),
+                    dplyr::across(c({{poll_var}}),
+                                  ~sum(is.na(.)),
                                   .names = 'n_na'))
   }
 
-  d_na_poll <- purrr::map2(l_poll, v, ~air_na_i(d = .x,
+  d_na_poll <- purrr::map2(dplyr::all_of(l_poll), dplyr::all_of(v), ~air_na_i(d = .x,
                                                time_unit = {{time_unit}},
                                                grp = t_grp,
                                                poll_var = .y)) %>%
     purrr::map(., dplyr::ungroup) %>%
     purrr::map(., ~dplyr::mutate(., na_pct = n_na/mo_days)) %>%
     purrr::map2(., v, ~dplyr::mutate(.x, .y = ifelse(na_pct >= 0.75, NA, .y))) %>%
-    purrr::map2(., v,  ~dplyr::select(.x, {.y})) %>%
+    purrr::map2(., v,  ~dplyr::select(.x, c(dplyr::ends_with('_n_na'), {.y}))) %>%
     purrr::reduce(., dplyr::bind_cols)
 
   d_nopoll <- dplyr::select(df, !dplyr::all_of(v))
@@ -76,9 +69,13 @@ get_monyr_means <- function(df, time_unit = c('month', 'year')) {
   air_means_i <- function(d, time_unit, grp) {
     d %>%
       dplyr::group_by(subjectid, dplyr::across({{grp}})) %>%
-      dplyr::summarise(dplyr::across(c(pm25, no2, o3), mean, .names = '{.col}_{time_unit}'),
-                       n_days = dplyr::n()) %>%
-      dplyr::ungroup()
+      dplyr::summarise(dplyr::across(c(pm25, no2, o3), ~mean(., na.rm = TRUE), .names = '{.col}_{time_unit}'),
+                       n_days = dplyr::n(),
+                       dplyr::across(dplyr::ends_with('_n_na'), mean),
+                       n_days_month = max(n_days_month),
+                       n_days_year = max(n_days_year),
+                       .groups = 'drop') %>%
+      dplyr::mutate(., dplyr::across(dplyr::ends_with({time_unit}), ~replace(., is.nan(.), NA)))
   }
 
   d_mean <- air_means_i(d_poll, time_unit = time_unit, grp = all_of(t_grp))
@@ -90,11 +87,41 @@ get_monyr_means <- function(df, time_unit = c('month', 'year')) {
 
   d_sumry <- dplyr::bind_cols(d_mean, dn)
 
+  if (time_unit == 'month') {
+
+    d_sumry$pm25_month_n <- d_sumry$pm25_month_n - d_sumry$pm25_n_na
+    d_sumry$no2_month_n <- d_sumry$no2_month_n - d_sumry$no2_n_na
+    d_sumry$o3_month_n <- d_sumry$o3_month_n - d_sumry$o3_n_na
+
+    d_sumry$pct_comp_pm <- round(d_sumry$pm25_month_n/d_sumry$n_days_month, digits = 2)
+    d_sumry$pct_comp_no2 <- round(d_sumry$no2_month_n/d_sumry$n_days_month, digits = 2)
+    d_sumry$pct_comp_o3 <- round(d_sumry$o3_month_n/d_sumry$n_days_month, digits = 2)
+
+    d_sumry[d_sumry$pct_comp_pm < 0.75, 'pm25_month'] <- NA
+    d_sumry[d_sumry$pct_comp_no2 < 0.75, 'no2_month'] <- NA
+    d_sumry[d_sumry$pct_comp_o3 < 0.75, 'o3_month'] <- NA
+
+  }else if (time_unit == 'year') {
+    d_sumry$pm25_year_n <- d_sumry$pm25_year_n - d_sumry$pm25_n_na
+    d_sumry$no2_year_n <- d_sumry$no2_year_n - d_sumry$no2_n_na
+    d_sumry$o3_year_n <- d_sumry$o3_year_n - d_sumry$o3_n_na
+
+    d_sumry$pct_comp_pm <- round(d_sumry$pm25_year_n/d_sumry$n_days_year, digits = 2)
+    d_sumry$pct_comp_no2 <- round(d_sumry$no2_year_n/d_sumry$n_days_year, digits = 2)
+    d_sumry$pct_comp_o3 <- round(d_sumry$o3_year_n/d_sumry$n_days_year, digits = 2)
+
+    d_sumry[d_sumry$pct_comp_pm < 0.75, 'pm25_year'] <- NA
+    d_sumry[d_sumry$pct_comp_no2 < 0.75, 'no2_year'] <- NA
+    d_sumry[d_sumry$pct_comp_o3 < 0.75, 'o3_year'] <- NA
+  }
+
   d_sumry <- d_sumry %>%
-    dplyr::select(subjectid, dplyr::starts_with({{time_unit}}),
+    dplyr::select(subjectid,
+                  dplyr::starts_with({{time_unit}}),
                   dplyr::starts_with('no2'),
                   dplyr::starts_with('pm25'),
-                  dplyr::starts_with('o3'))
+                  dplyr::starts_with('o3')) %>%
+    dplyr::select(-dplyr::ends_with('_na'))
 
   if ('cohort' %in% names(df)) {
     d_sumry$cohort <- unique(df$cohort)
